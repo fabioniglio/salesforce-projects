@@ -32,15 +32,17 @@
         ></c-clock-dropdown>
       </div>
     </div>
+    <template lwc:if={isAlarmNotSet}>
+      <button
+        class="slds-button slds-button_neutral slds-button_stretch"
+        disabled={isFieldNotSelected}
+        onclick={setAlarmHandler}
+      >
+        Set Alarm
+      </button>
+    </template>
 
-    <button
-      class="slds-button slds-button_neutral slds-button_stretch"
-      disabled={isFieldNotSelected}
-      onclick={setAlarmHandler}
-    >
-      Set Alarm
-    </button>
-    <template lwc:if={isAlarmSet}>
+    <template lwc:elseif={isAlarmSet}>
       <button
         class="slds-button slds-button_neutral slds-button_stretch"
         onclick={clearAlarmHandler}

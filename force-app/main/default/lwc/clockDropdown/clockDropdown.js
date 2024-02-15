@@ -21,4 +21,10 @@ export default class ClockDropdown extends LightningElement {
       })
     );
   }
+
+  @api
+  reset(value) {
+    this.template.querySelector("select").value = value;
+    this.callParent(value);
+  }
 }

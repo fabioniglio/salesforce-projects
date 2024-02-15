@@ -10,6 +10,7 @@ export default class AlarmClockApp extends LightningElement {
   minutes = [];
   meridiems = ["AM", "PM"];
   alarmTime;
+  isAlarmNotSet = true;
   isAlarmSet;
 
   hourSelected;
@@ -91,14 +92,18 @@ export default class AlarmClockApp extends LightningElement {
   setAlarmHandler() {
     this.alarmTime = `${this.hourSelected}:${this.minSelected} ${this.meridiemSelected}`;
     this.isAlarmSet = true;
+    this.isAlarmNotSet = false;
   }
 
   clearAlarmHandler() {
     this.alarmTime = "";
     this.isAlarmSet = false;
+    this.isAlarmNotSet = true;
 
-    this.hourSelected = "";
-    this.minSelected = "";
-    this.meridiemSelected = "";
+    const elements = this.template.querySelectorAll("c-clock-dropdown");
+
+    Array.from(elements).forEach((element) => {
+      element.reset("");
+    });
   }
 }
