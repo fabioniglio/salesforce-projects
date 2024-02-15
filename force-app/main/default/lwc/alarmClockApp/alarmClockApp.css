@@ -40,3 +40,8 @@ button {
   color: var(--dark-blue);
   margin-top: 12px;
 }
+
+img {
+  margin: 20px auto;
+  display: block;
+}
