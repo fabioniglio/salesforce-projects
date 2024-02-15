@@ -1,0 +1,41 @@
+<template>
+
+  
+        <lightning-card title="Accounts List View" icon-name="standard:account">
+            <div class="slds-m-around_medium">
+                <lightning-input type="text" label="Search" onchange={handleSearchChange} value={searchkey} placeholder="Type here to search for Accounts"></lightning-input>
+            </div>
+            <div class="slds-m-around_medium">
+                <lightning-datatable
+                key-field="Id"
+                data={accounts}
+                columns={columns}
+                onrowselection={handleRowSelection}
+                
+                max-row-selection="1"
+                >
+            </lightning-datatable>
+            </div>
+
+            
+
+        </lightning-card>
+        <template if:true={contacts}>
+            <lightning-card title="Contact List View" icon-name="standard:contact">
+                <div class="slds-m-around_medium">
+    
+                    <lightning-datatable
+                    key-field="Id"
+                    data={contacts}
+                    columns={contactColumns}
+                    onsave={handleSave}
+                    draft-values={draftValues}
+                    ></lightning-datatable>
+                </div>
+                        
+    
+            </lightning-card>
+        </template>
+        
+
+</template>
