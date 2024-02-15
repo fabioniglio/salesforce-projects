@@ -1,0 +1,10 @@
+.alarm-card {
+    max-width: 440px;
+    width: 100%;
+    padding: 30px;
+    background: #243356;
+    color: #ffffff;
+    border-radius: 16px;
+    margin: 24px auto;
+
+}
