@@ -5,6 +5,7 @@ import AlarmClockAssets from "@salesforce/resourceUrl/AlarmClockAssets";
 
 export default class AlarmClockApp extends LightningElement {
   clockImage = AlarmClockAssets + "/AlarmClockAssets/clock.png";
+  ringtone = new Audio(AlarmClockAssets + "/AlarmClockAssets/Clocksound.mp3");
   currentTime;
   hours = [];
   minutes = [];
@@ -12,6 +13,7 @@ export default class AlarmClockApp extends LightningElement {
   alarmTime;
   isAlarmNotSet = true;
   isAlarmSet;
+  IsAlarmTriggered = false;
 
   hourSelected;
   minSelected;
@@ -19,6 +21,10 @@ export default class AlarmClockApp extends LightningElement {
 
   get isFieldNotSelected() {
     return !(this.hourSelected && this.minSelected && this.meridiemSelected);
+  }
+
+  get shakeImage() {
+    return this.isAlarmTriggered ? "shake" : "";
   }
 
   connectedCallback() {
@@ -52,9 +58,9 @@ export default class AlarmClockApp extends LightningElement {
       this.currentTime = `${hour}:${min}:${sec} ${ampm}`;
       if (this.alarmTime === `${hour}:${min} ${ampm}`) {
         console.log("Alarm Triggered!!");
-        //   this.isAlarmTriggered = true;
-        //   this.ringtone.play();
-        //   this.ringtone.loop = true;
+        this.isAlarmTriggered = true;
+        this.ringtone.play();
+        this.ringtone.loop = true;
       }
     }, 1000);
   }
@@ -83,10 +89,6 @@ export default class AlarmClockApp extends LightningElement {
       this.meridiemSelected = value;
     } else {
     }
-
-    console.log(" this.hourSelected", this.hourSelected);
-    console.log(" this.minSelected", this.minSelected);
-    console.log(" this.meridiemSelected", this.meridiemSelected);
   }
 
   setAlarmHandler() {
@@ -99,6 +101,8 @@ export default class AlarmClockApp extends LightningElement {
     this.alarmTime = "";
     this.isAlarmSet = false;
     this.isAlarmNotSet = true;
+    this.isAlarmTriggered = false;
+    this.ringtone.pause();
 
     const elements = this.template.querySelectorAll("c-clock-dropdown");
 
