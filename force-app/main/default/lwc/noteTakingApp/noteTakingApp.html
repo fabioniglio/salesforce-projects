@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <div class="box box-center">
+    <div class="box box-center" onclick={createNoteHandler}>
       <div class="dotted-circle">
         <lightning-icon
           icon-name="utility:add"
@@ -17,23 +17,63 @@
         <h2 class="slds-truncate">Note Heading</h2>
       </header>
       <div class="notes">description Text comes here</div>
-      <footer>
-        <div>Fri Feb 23 2024</div>
+      <footer class="footer">
+        <div class="date">Fri Feb 23 2024</div>
         <div>
           <lightning-icon
             icon-name="action:edit"
             alternative-text="edit"
             size="small"
             title="edit"
+            class="edit-icon slds-var-m-right_x-small"
           ></lightning-icon>
           <lightning-icon
             icon-name="action:delete"
             alternative-text="delete"
             size="small"
             title="delete"
+            class="delete-icon"
           ></lightning-icon>
         </div>
       </footer>
     </div>
   </div>
+  <template if:true={showModal}>
+    <c-modal>
+      <h1 slot="header" class="slds-modal__title">Add Note</h1>
+      <form>
+        <lightning-input
+          type="text"
+          label="Title"
+          name="Name"
+          value={noteRecord.Name}
+          onchange={changeHandler}
+          class="slds-m-bottom_medium"
+        ></lightning-input>
+
+        <lightning-input-rich-text
+          label="Description"
+          name="Note_Description__c"
+          label-visible
+          formats={formats}
+          value={noteRecord.Note_Description__c}
+          onchange={changeHandler}
+        >
+        </lightning-input-rich-text>
+      </form>
+      <footer slot="footer">
+        <Button
+          class="slds-button slds-button_neutral"
+          onclick={closeModalHandler}
+          >Cancel</Button
+        >
+        <Button
+          class="slds-button slds-button_brand"
+          onclick={formSubmitHandler}
+          disabled={isFormInvalid}
+          >Save</Button
+        >
+      </footer>
+    </c-modal>
+  </template>
 </template>
