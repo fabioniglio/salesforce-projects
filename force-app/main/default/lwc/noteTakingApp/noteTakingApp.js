@@ -1,5 +1,5 @@
 import { LightningElement } from "lwc";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
+
 import createNoteRecord from "@salesforce/apex/NoteTakingController.createNoteRecord";
 
 const DEFAULT_NOTE_FORM = {
@@ -56,6 +56,7 @@ export default class NoteTakingApp extends LightningElement {
   formSubmitHandler(event) {
     event.preventDefault();
     console.log("this.noteRecord", JSON.stringify(this.noteRecord));
+
     this.createNote();
   }
 
@@ -68,6 +69,7 @@ export default class NoteTakingApp extends LightningElement {
         this.showModal = false;
         // You might want to reset the form or display a success message here.
         this.noteRecord = { ...DEFAULT_NOTE_FORM }; // Resetting the form to default.
+        this.showToastMsg("Note Created Successfully!!!", "success");
       })
       .catch((error) => {
         // Improved error handling
@@ -80,7 +82,15 @@ export default class NoteTakingApp extends LightningElement {
           message = error.body.message;
         }
         console.error("Error creating note:", message);
+        this.showToastMsg(message, "error");
         // Here you can handle the error, like showing an error message to the user
       });
+  }
+
+  showToastMsg(message, variant) {
+    const elem = this.template.querySelector("c-notification");
+    if (elem) {
+      elem.showToast(message, variant);
+    }
   }
 }
