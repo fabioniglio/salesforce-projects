@@ -1,4 +1,6 @@
 import { LightningElement } from "lwc";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import createNoteRecord from "@salesforce/apex/NoteTakingController.createNoteRecord";
 
 const DEFAULT_NOTE_FORM = {
   Name: "",
@@ -54,5 +56,31 @@ export default class NoteTakingApp extends LightningElement {
   formSubmitHandler(event) {
     event.preventDefault();
     console.log("this.noteRecord", JSON.stringify(this.noteRecord));
+    this.createNote();
+  }
+
+  createNote() {
+    createNoteRecord({
+      title: this.noteRecord.Name,
+      description: this.noteRecord.Note_Description__c
+    })
+      .then(() => {
+        this.showModal = false;
+        // You might want to reset the form or display a success message here.
+        this.noteRecord = { ...DEFAULT_NOTE_FORM }; // Resetting the form to default.
+      })
+      .catch((error) => {
+        // Improved error handling
+        let message = "Unknown error"; // Default error message
+        if (Array.isArray(error.body)) {
+          // If the error is an array (bulk errors), join all messages.
+          message = error.body.map((e) => e.message).join(", ");
+        } else if (error.body && typeof error.body.message === "string") {
+          // If the error is a single object with a message.
+          message = error.body.message;
+        }
+        console.error("Error creating note:", message);
+        // Here you can handle the error, like showing an error message to the user
+      });
   }
 }
