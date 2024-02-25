@@ -22,6 +22,8 @@ export default class AppendHTML extends LightningElement {
   attachHtml() {
     const container = this.template.querySelector(".htmlcontainer");
 
+    console.log("Container", container);
+
     if (container) {
       container.innerHTML = this._result;
       this.loaded = true;

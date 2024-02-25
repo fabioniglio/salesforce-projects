@@ -18,7 +18,11 @@
         <header>
           <h2 class="slds-truncate">{note.Name}</h2>
         </header>
-        <div class="notes"></div>
+        <div class="notes">
+          <lightning-formatted-rich-text
+            value={note.Note_Description__c}
+          ></lightning-formatted-rich-text>
+        </div>
         <footer class="footer">
           <div class="date">{note.formatedDate}</div>
           <div>
