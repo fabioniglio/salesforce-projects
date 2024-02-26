@@ -2,6 +2,11 @@ import { LightningElement, wire } from "lwc";
 
 import createNoteRecord from "@salesforce/apex/NoteTakingController.createNoteRecord";
 import getNotes from "@salesforce/apex/NoteTakingController.getNotes";
+import updateNoteRecord from "@salesforce/apex/NoteTakingController.updateNoteRecord";
+import deleteNoteRecord from "@salesforce/apex/NoteTakingController.deleteNoteRecord";
+
+import { refreshApex } from "@salesforce/apex";
+import LightningConfirm from "lightning/confirm";
 
 const DEFAULT_NOTE_FORM = {
   Name: "",
@@ -13,6 +18,8 @@ export default class NoteTakingApp extends LightningElement {
 
   noteRecord = DEFAULT_NOTE_FORM;
   noteList = [];
+  selectedRecordId;
+  wiredNoteResult;
 
   formats = [
     "font",
@@ -39,8 +46,15 @@ export default class NoteTakingApp extends LightningElement {
     );
   }
 
+  get modalName() {
+    return this.selectedRecordId ? "Update Note" : "Add Note";
+  }
+
   @wire(getNotes)
-  noteListInfo({ data, error }) {
+  noteListInfo(result) {
+    this.wiredNoteResult = result;
+
+    const { data, error } = result;
     if (data) {
       console.log("Data of notes", JSON.stringify(data));
       this.noteList = data.map((item) => {
@@ -62,6 +76,7 @@ export default class NoteTakingApp extends LightningElement {
     this.showModal = false;
 
     this.noteRecord = DEFAULT_NOTE_FORM;
+    this.selectedRecordId = null;
   }
 
   changeHandler(event) {
@@ -73,8 +88,11 @@ export default class NoteTakingApp extends LightningElement {
   formSubmitHandler(event) {
     event.preventDefault();
     console.log("this.noteRecord", JSON.stringify(this.noteRecord));
-
-    this.createNote();
+    if (this.selectedRecordId) {
+      this.updateNote(this.selectedRecordId);
+    } else {
+      this.createNote();
+    }
   }
 
   createNote() {
@@ -84,9 +102,10 @@ export default class NoteTakingApp extends LightningElement {
     })
       .then(() => {
         this.showModal = false;
-        // You might want to reset the form or display a success message here.
-        this.noteRecord = { ...DEFAULT_NOTE_FORM }; // Resetting the form to default.
+        this.selectedRecordId = null;
+        this.noteRecord = { ...DEFAULT_NOTE_FORM };
         this.showToastMsg("Note Created Successfully!!!", "success");
+        this.refresh();
       })
       .catch((error) => {
         // Improved error handling
@@ -100,7 +119,6 @@ export default class NoteTakingApp extends LightningElement {
         }
         console.error("Error creating note:", message);
         this.showToastMsg(message, "error");
-        // Here you can handle the error, like showing an error message to the user
       });
   }
 
@@ -109,5 +127,77 @@ export default class NoteTakingApp extends LightningElement {
     if (elem) {
       elem.showToast(message, variant);
     }
+  }
+
+  editNoteHandler(event) {
+    const { recordid } = event.target.dataset;
+    const noteRecord = this.noteList.find((item) => item.Id === recordid);
+    this.noteRecord = {
+      Name: noteRecord.Name,
+      Note_Description__c: noteRecord.Note_Description__c
+    };
+    console.log("Updating note with:", JSON.stringify(this.noteRecord));
+    this.selectedRecordId = recordid;
+    this.showModal = true;
+  }
+
+  updateNote(noteId) {
+    const { Name, Note_Description__c } = this.noteRecord;
+
+    console.log("Updating note with:", Name, Note_Description__c);
+    updateNoteRecord({
+      noteId: noteId,
+      title: Name,
+      description: Note_Description__c
+    })
+      .then(() => {
+        this.showModal = false;
+
+        this.showToastMsg("Note Updated Successfully!!", "success");
+        this.refresh();
+        this.selectedRecordId = null;
+      })
+      .catch((error) => {
+        console.error("error in updating", error);
+        this.showToastMsg(error.message.body, "error");
+      });
+  }
+  refresh() {
+    return refreshApex(this.wiredNoteResult);
+  }
+
+  deleteNoteHandler(event) {
+    this.selectedRecordId = event.target.dataset.recordid;
+
+    this.handleConfirm();
+  }
+
+  async handleConfirm() {
+    const result = await LightningConfirm.open({
+      message: "Are you sure you want to delete this note?",
+      variant: "headerless",
+      label: "Delete Confirmation"
+    });
+
+    if (result) {
+      this.deleteHandler();
+    } else {
+      this.selectedRecordId = null;
+    }
+  }
+
+  deleteHandler() {
+    deleteNoteRecord({ noteId: this.selectedRecordId })
+      .then(() => {
+        this.showModal = false;
+
+        this.showToastMsg("Note deleted Successfully!!", "success");
+        this.refresh();
+        this.selectedRecordId = null;
+      })
+      .catch((error) => {
+        console.error("error in updating", error);
+        this.showToastMsg(error.message.body, "error");
+      });
   }
 }

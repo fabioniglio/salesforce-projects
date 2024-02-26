@@ -19,9 +19,13 @@
           <h2 class="slds-truncate">{note.Name}</h2>
         </header>
         <div class="notes">
-          <lightning-formatted-rich-text
+          <c-append-new-html
+            result={note.Note_Description__c}
+          ></c-append-new-html>
+
+          <!-- <lightning-formatted-rich-text
             value={note.Note_Description__c}
-          ></lightning-formatted-rich-text>
+          ></lightning-formatted-rich-text> -->
         </div>
         <footer class="footer">
           <div class="date">{note.formatedDate}</div>
@@ -31,14 +35,18 @@
               alternative-text="edit"
               size="small"
               title="edit"
-              class="edit-icon slds-var-m-right_x-small"
+              class="edit-icon slds-var-m-right_x-small cursor"
+              data-recordid={note.Id}
+              onclick={editNoteHandler}
             ></lightning-icon>
             <lightning-icon
               icon-name="action:delete"
               alternative-text="delete"
               size="small"
               title="delete"
-              class="delete-icon"
+              class="delete-icon cursor"
+              data-recordid={note.Id}
+              onclick={deleteNoteHandler}
             ></lightning-icon>
           </div>
         </footer>
@@ -47,7 +55,7 @@
   </div>
   <template if:true={showModal}>
     <c-modal>
-      <h1 slot="header" class="slds-modal__title">Add Note</h1>
+      <h1 slot="header" class="slds-modal__title">{modalName}</h1>
       <form>
         <lightning-input
           type="text"
@@ -78,7 +86,7 @@
           class="slds-button slds-button_brand"
           onclick={formSubmitHandler}
           disabled={isFormInvalid}
-          >Save</Button
+          >{modalName}</Button
         >
       </footer>
     </c-modal>
